@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0081cc;
+  --color-secondary: #00adff;
+  --color-accent: #ff8c00;
+  --color-brand-red: #ce1126;
+  --color-dark: #003366;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .bg-water-gradient {
+    background: linear-gradient(135deg, #00adff 0%, #0081cc 100%);
+  }
+
+  .animate-slow-zoom {
+    animation: slowZoom 20s ease-in-out infinite;
+  }
+
+  @keyframes slowZoom {
+    0% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.1);
+    }
+
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .text-gradient {
+    background: linear-gradient(to right, #ffffff, #e0f2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .animate-bounce-slow {
+    animation: bounce 3s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+
+  .animate-wave-slow {
+    animation: wave 4s ease-in-out infinite;
+  }
+
+  .animate-wave-fast {
+    animation: wave 2.5s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+
+  /* Slide in from left animation */
+  .animate-in {
+    animation-fill-mode: both;
+  }
+
+  .slide-in-from-left {
+    animation-name: slideInFromLeft;
+  }
+
+  .fade-in {
+    animation-name: fadeIn;
+  }
+
+  .duration-1000 {
+    animation-duration: 1000ms;
+  }
+
+  .delay-\[2000ms\] {
+    animation-delay: 2000ms;
+  }
+
+  @keyframes slideInFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-100px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@keyframes wave {
+
+  0%,
+  100% {
+    transform: translateX(-25%) rotate(0deg);
+  }
+
+  50% {
+    transform: translateX(-50%) rotate(5deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}

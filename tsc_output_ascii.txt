@@ -1,0 +1,2 @@
+src/modules/finance/FinanceModule.tsx(8,5): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/modules/quality-control/QCModule.tsx(8,5): error TS6133: 'History' is declared but its value is never read.
