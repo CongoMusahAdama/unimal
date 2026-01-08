@@ -7,7 +7,6 @@ import {
     ArrowDown,
     Calendar,
     Settings,
-    ArrowRight,
     Hammer,
     Cog,
     Plus,

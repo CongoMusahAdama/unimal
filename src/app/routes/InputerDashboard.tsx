@@ -27,7 +27,6 @@ import {
 } from 'recharts';
 
 import BaseModal from '../../components/modals/BaseModal';
-import { useStaff } from '../../context/StaffContext';
 import ProductionForm from '../../components/forms/ProductionForm';
 import SalesForm from '../../components/forms/SalesForm';
 import InventoryForm from '../../components/forms/InventoryForm';
@@ -50,7 +49,6 @@ const pendingApprovals = [
 ];
 
 const InputerDashboard: React.FC = () => {
-    //const { staffList, clockIn, clockOut } = useStaff();
     const [currentTime, setCurrentTime] = useState(new Date());
 
     useEffect(() => {
