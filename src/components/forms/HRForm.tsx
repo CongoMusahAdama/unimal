@@ -1,6 +1,6 @@
 import React from 'react';
 
-const HRForm: React.FC<{ initialData?: any; onSubmit: () => void; onCancel: () => void }> = ({ initialData, onSubmit, onCancel }) => {
+const HRForm: React.FC<{ onSubmit: () => void; onCancel: () => void }> = ({ onSubmit, onCancel }) => {
     return (
         <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

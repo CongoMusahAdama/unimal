@@ -342,7 +342,6 @@ const HRModule: React.FC = () => {
                 title={modalConfig.mode === 'add' ? 'New Employee Record' : 'Update Employee / Attendance'}
             >
                 <HRForm
-                    initialData={modalConfig.initialData}
                     onSubmit={handleSubmit}
                     onCancel={() => setModalConfig({ ...modalConfig, isOpen: false })}
                 />
