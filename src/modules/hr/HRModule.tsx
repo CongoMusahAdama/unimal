@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldAlert, Users, Briefcase, CalendarClock, Pencil, Trash2, Plus, ArrowRight } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import BaseModal from '../../components/modals/BaseModal';
 import HRForm from '../../components/forms/HRForm';
 
@@ -75,15 +75,7 @@ const HRModule: React.FC = () => {
         setModalConfig({ ...modalConfig, isOpen: false });
     };
 
-    const handleClockIn = (id: string) => {
-        clockIn(id);
-        alert('Staff Member Clocked In Successfully');
-    };
 
-    const handleClockOut = (id: string) => {
-        clockOut(id);
-        alert('Staff Member Clocked Out Successfully');
-    };
 
     return (
         <div className="space-y-10 animate-in fade-in duration-700">

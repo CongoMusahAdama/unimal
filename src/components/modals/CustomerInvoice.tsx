@@ -6,9 +6,6 @@ import {
     CheckCircle2,
     User,
     Truck,
-    Calendar,
-    Hash,
-    DollarSign,
     Package,
     ArrowRight
 } from 'lucide-react';
