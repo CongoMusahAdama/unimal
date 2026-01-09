@@ -33,6 +33,7 @@ import InventoryForm from '../../components/forms/InventoryForm';
 import ExpenseForm from '../../components/forms/ExpenseForm';
 import QCForm from '../../components/forms/QCForm';
 import HRForm from '../../components/forms/HRForm';
+import CustomerInvoice from '../../components/modals/CustomerInvoice';
 
 // Mock Data
 const summaryStats = [
@@ -59,14 +60,14 @@ const InputerDashboard: React.FC = () => {
     const [modalConfig, setModalConfig] = useState<{
         isOpen: boolean;
         title: string;
-        type: 'production' | 'sales' | 'inventory' | 'expense' | 'qc' | 'hr' | null;
+        type: 'production' | 'sales' | 'inventory' | 'expense' | 'qc' | 'hr' | 'invoice' | null;
     }>({
         isOpen: false,
         title: '',
         type: null
     });
 
-    const openModal = (type: 'production' | 'sales' | 'inventory' | 'expense' | 'qc' | 'hr', title: string) => {
+    const openModal = (type: 'production' | 'sales' | 'inventory' | 'expense' | 'qc' | 'hr' | 'invoice', title: string) => {
         setModalConfig({ isOpen: true, title, type });
     };
 
@@ -81,12 +82,13 @@ const InputerDashboard: React.FC = () => {
     };
 
     const quickActions = [
+        { label: 'Take Attendance', icon: Users, color: 'text-teal-600', bgColor: 'bg-teal-50', description: 'Log employee shift presence', type: 'hr' },
         { label: 'Add Production', icon: Factory, color: 'text-blue-600', bgColor: 'bg-blue-50', description: 'Log daily production runs', type: 'production' },
         { label: 'Record Sales', icon: Truck, color: 'text-green-600', bgColor: 'bg-green-50', description: 'Entry for truck loading & deliveries', type: 'sales' },
+        { label: 'Generate Invoice', icon: FileText, color: 'text-orange-600', bgColor: 'bg-orange-50', description: 'Create official customer billings', type: 'invoice' },
         { label: 'Issue Stock', icon: Package, color: 'text-amber-600', bgColor: 'bg-amber-50', description: 'Manage inventory withdrawals', type: 'inventory' },
         { label: 'Log Expense', icon: Calculator, color: 'text-rose-600', bgColor: 'bg-rose-50', description: 'Record petty cash & operational costs', type: 'expense' },
         { label: 'Quality Log', icon: ClipboardCheck, color: 'text-indigo-600', bgColor: 'bg-indigo-50', description: 'Water tests & batch sign-offs', type: 'qc' },
-        { label: 'Attendance', icon: Users, color: 'text-teal-600', bgColor: 'bg-teal-50', description: 'Track employee shift presence', type: 'hr' },
     ] as const;
 
     return (
@@ -166,37 +168,37 @@ const InputerDashboard: React.FC = () => {
                 </div>
             </div>
 
-            {/* 2. QUICK ACTIONS (CRUD HUB) */}
-            <div>
+            {/* 2. QUICK ACTIONS (CRUD HUB) - MOVED TO TOP */}
+            <div className="animate-in slide-in-from-top duration-700">
                 <div className="flex items-center space-x-4 mb-8">
                     <span className="w-10 h-1 bg-[#0081cc] rounded-full"></span>
-                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">Quick Entry Actions</h3>
+                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">Primary Entry Portal</h3>
                 </div>
 
-                {/* (Staff Control Moved to HR Module) */}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 md:gap-5">
                     {quickActions.map((action, i) => (
                         <button
                             key={i}
                             onClick={() => openModal(action.type, action.label)}
-                            className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all group text-left flex flex-col justify-between h-auto min-h-[220px]"
+                            className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all group text-left flex flex-col justify-between h-auto min-h-[180px]"
                         >
-                            <div className={`${action.bgColor} ${action.color} w-12 h-12 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                                <action.icon size={24} />
+                            <div className={`${action.bgColor} ${action.color} w-10 h-10 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                                <action.icon size={20} />
                             </div>
-                            <div className="space-y-2">
-                                <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight leading-none">{action.label}</h4>
-                                <p className="text-[10px] font-bold text-slate-400 leading-tight">{action.description}</p>
+                            <div className="space-y-1">
+                                <h4 className="text-xs font-black text-slate-900 uppercase tracking-tight leading-none">{action.label}</h4>
+                                <p className="text-[9px] font-bold text-slate-400 leading-tight line-clamp-2">{action.description}</p>
                             </div>
-                            <div className="mt-4 flex items-center text-[10px] font-black text-[#0081cc] uppercase tracking-widest transition-opacity">
-                                <span>Open Form</span>
-                                <Plus size={12} className="ml-1" />
+                            <div className="mt-4 flex items-center text-[9px] font-black text-[#0081cc] uppercase tracking-widest">
+                                <span>Record</span>
+                                <Plus size={10} className="ml-1" />
                             </div>
                         </button>
                     ))}
                 </div>
             </div>
+
+
 
             {/* Modal */}
             <BaseModal
@@ -210,6 +212,7 @@ const InputerDashboard: React.FC = () => {
                 {modalConfig.type === 'expense' && <ExpenseForm onSubmit={handleSubmit} onCancel={closeModal} />}
                 {modalConfig.type === 'qc' && <QCForm onSubmit={handleSubmit} onCancel={closeModal} />}
                 {modalConfig.type === 'hr' && <HRForm onSubmit={handleSubmit} onCancel={closeModal} />}
+                {modalConfig.type === 'invoice' && <CustomerInvoice onSubmit={handleSubmit} onCancel={closeModal} />}
             </BaseModal>
 
             {/* 3. DEPARTMENTAL STATUS RECAP */}

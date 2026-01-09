@@ -85,9 +85,16 @@ const SalesForm: React.FC<{ onSubmit: () => void; onCancel: () => void }> = ({ o
                 </button>
                 <button
                     type="submit"
-                    className="bg-green-600 text-white px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-green-600/20 hover:-translate-y-1 active:scale-95 transition-all"
+                    className="bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-600/20 hover:-translate-y-1 active:scale-95 transition-all"
                 >
-                    Record & Post Sales Entry
+                    Record & Post Entry
+                </button>
+                <div className="h-10 w-px bg-slate-100 mx-2"></div>
+                <button
+                    type="button"
+                    className="border-2 border-[#003366] text-[#003366] px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[#003366] hover:text-white transition-all flex items-center space-x-2"
+                >
+                    <span>Print Invoice</span>
                 </button>
             </div>
         </form>

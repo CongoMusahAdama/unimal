@@ -5,9 +5,12 @@ import BaseModal from '../../components/modals/BaseModal';
 import HRForm from '../../components/forms/HRForm';
 
 import { useStaff } from '../../context/StaffContext';
+import { useAuth } from '../../services/auth/AuthContext';
 
 const HRModule: React.FC = () => {
     const { staffList, deleteStaff, clockIn, clockOut } = useStaff();
+    const { user } = useAuth();
+    const isInputer = user?.role === 'INPUTER';
 
     // 1. Mock Data (KPIs, Charts...)
     const attendanceTrend = [
@@ -32,6 +35,14 @@ const HRModule: React.FC = () => {
         { label: 'Payroll Forecast', value: '₵62k', sub: 'Monthly Est.', trend: '-2%', icon: Briefcase, color: 'bg-[#10b981] text-white' },
         { label: 'Safety Incidents', value: '0', sub: 'Year to Date', trend: '0%', icon: ShieldAlert, color: 'bg-[#ce1126] text-white' },
     ];
+
+    const [selectedDept, setSelectedDept] = useState<string>('All');
+    const departments = ['All', ...new Set(staffList.map(s => s.dept))];
+
+    // Filtered lists
+    const filteredStaff = selectedDept === 'All'
+        ? staffList
+        : staffList.filter(s => s.dept === selectedDept);
 
     // Modal State
     const [modalConfig, setModalConfig] = useState<{
@@ -123,60 +134,123 @@ const HRModule: React.FC = () => {
 
 
 
-            {/* Active Staff Control Grid (Rapid Access) */}
-            <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm relative overflow-hidden">
-                <div className="flex items-center justify-between mb-8 relative z-10">
+            {/* Department Filter Strip */}
+            <div className="bg-white p-4 rounded-3xl border border-slate-50 shadow-sm flex items-center space-x-3 overflow-x-auto no-scrollbar flex-nowrap">
+                <div className="flex items-center space-x-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 flex-shrink-0">
+                    <Briefcase size={14} className="text-slate-400" />
+                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Filter by Department:</span>
+                </div>
+                {departments.map(dept => (
+                    <button
+                        key={dept}
+                        onClick={() => setSelectedDept(dept)}
+                        className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${selectedDept === dept
+                            ? 'bg-[#003366] text-white shadow-lg'
+                            : 'bg-white text-slate-400 hover:text-slate-600 border border-slate-100'
+                            }`}
+                    >
+                        {dept}
+                    </button>
+                ))}
+            </div>
+
+            {/* 3. Dedicated Attendance Duty Register Table */}
+            <div className="bg-slate-900 p-10 rounded-[3rem] text-white shadow-2xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500 opacity-5 rounded-full -mr-48 -mt-48 blur-[80px]"></div>
+
+                <div className="flex items-center justify-between mb-10 relative z-10">
                     <div className="flex items-center space-x-3">
-                        <div className="bg-[#003366] p-3 rounded-2xl text-white shadow-lg shadow-blue-900/20">
-                            <Users size={24} />
+                        <div className="bg-white/10 p-3 rounded-2xl">
+                            <CalendarClock size={24} className="text-blue-400" />
                         </div>
                         <div>
-                            <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Active Team Control</h3>
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Live Shift Management</p>
+                            <h3 className="text-xl font-black uppercase tracking-tight">Daily Attendance Register</h3>
+                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest"> Formal Shift Enrollment Ledger {selectedDept !== 'All' ? `• ${selectedDept}` : ''}</p>
                         </div>
                     </div>
+                    {isInputer && (
+                        <div className="flex items-center space-x-2 bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20">
+                            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Live Entry Active</span>
+                        </div>
+                    )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative z-10">
-                    {staffList.map((staff) => (
-                        <div key={staff.id} className="group bg-slate-50 hover:bg-white p-6 rounded-[2rem] border border-transparent hover:border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
-                            {/* Status Indicator Line */}
-                            <div className={`absolute top-0 left-0 w-full h-1.5 transition-colors duration-300 ${staff.status === 'Active' ? 'bg-emerald-500' :
-                                staff.status === 'Clocked Out' ? 'bg-slate-300' : 'bg-amber-400'
-                                }`}></div>
-
-                            <div className="flex items-start justify-between mb-6 pt-2">
-                                <div className="flex items-center space-x-3">
-                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm shadow-inner transition-colors duration-300 ${staff.status === 'Active' ? 'bg-emerald-100 text-emerald-700' :
-                                        'bg-white text-slate-400 border border-slate-100'
-                                        }`}>
-                                        {staff.name.charAt(0)}
-                                    </div>
-                                    <div>
-                                        <h4 className="font-black text-slate-800 leading-tight group-hover:text-[#003366] transition-colors">{staff.name}</h4>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">{staff.role}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-between bg-white rounded-xl p-1.5 border border-slate-100 shadow-sm gap-2">
-                                <button
-                                    onClick={() => { clockIn(staff.id); alert(`${staff.name} Clocked In!`); }}
-                                    disabled={staff.status === 'Active' || staff.status === 'On Route'}
-                                    className="flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-200 flex items-center justify-center space-x-1 hover:-translate-y-0.5 disabled:translate-y-0 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white disabled:opacity-30 disabled:hover:bg-emerald-50 disabled:hover:text-emerald-600"
-                                >
-                                    <span>Clock In</span>
-                                </button>
-                                <button
-                                    onClick={() => { clockOut(staff.id); alert(`${staff.name} Clocked Out!`); }}
-                                    disabled={staff.status === 'Clocked Out'}
-                                    className="flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-200 flex items-center justify-center space-x-1 hover:-translate-y-0.5 disabled:translate-y-0 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white disabled:opacity-30 disabled:hover:bg-rose-50 disabled:hover:text-rose-600"
-                                >
-                                    <span>Clock Out</span>
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                <div className="overflow-x-auto relative z-10">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="border-b border-white/5">
+                                <th className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-white/40">Employee Name</th>
+                                <th className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-white/40">Shift</th>
+                                <th className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-white/40">Clock-In Time</th>
+                                <th className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-white/40">Duty Duration</th>
+                                <th className="py-4 px-2 text-[10px] font-black uppercase tracking-widest text-right text-white/40">Presence Control</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {filteredStaff.map((staff) => (
+                                <tr key={staff.id} className="hover:bg-white/5 transition-colors group/register">
+                                    <td className="py-5 px-2">
+                                        <div className="flex items-center space-x-3">
+                                            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-[10px] font-black">
+                                                {staff.name.charAt(0)}
+                                            </div>
+                                            <span className="text-sm font-bold text-white/90">{staff.name}</span>
+                                        </div>
+                                    </td>
+                                    <td className="py-5 px-2">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-white/50">{staff.shift}</span>
+                                    </td>
+                                    <td className="py-5 px-2">
+                                        {staff.clockInTime ? (
+                                            <span className="text-xs font-black text-emerald-400">
+                                                {new Date(staff.clockInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        ) : (
+                                            <span className="text-[10px] font-bold text-white/20 uppercase">Not Recorded</span>
+                                        )}
+                                    </td>
+                                    <td className="py-5 px-2">
+                                        <div className="flex items-center space-x-2">
+                                            <div className="w-16 h-1 bg-white/10 rounded-full overflow-hidden">
+                                                <div
+                                                    className={`h-full ${staff.status === 'Active' ? 'bg-emerald-500' : 'bg-white/20'}`}
+                                                    style={{ width: `${Math.min(100, (staff.totalHoursToday / 8) * 100)}%` }}
+                                                ></div>
+                                            </div>
+                                            <span className="text-[10px] font-black text-white/60">{staff.totalHoursToday.toFixed(1)}h</span>
+                                        </div>
+                                    </td>
+                                    <td className="py-5 px-2 text-right">
+                                        {isInputer ? (
+                                            <div className="flex items-center justify-end space-x-2">
+                                                {staff.status !== 'Active' ? (
+                                                    <button
+                                                        onClick={() => { clockIn(staff.id); alert(`${staff.name} Clocked In`); }}
+                                                        className="px-4 py-2 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/10"
+                                                    >
+                                                        Register In
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => { clockOut(staff.id); alert(`${staff.name} Clocked Out`); }}
+                                                        className="px-4 py-2 bg-[#ce1126] text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-500/10"
+                                                    >
+                                                        Confirm Out
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg ${staff.status === 'Active' ? 'text-emerald-400 bg-emerald-400/10' : 'text-white/20 bg-white/5'
+                                                }`}>
+                                                {staff.status}
+                                            </span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -200,12 +274,12 @@ const HRModule: React.FC = () => {
                                 <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest">Department</th>
                                 <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest">Deployment</th>
                                 <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-center">Duty Status</th>
-                                <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-center">Time Clock</th>
+                                <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-center">Work Hours</th>
                                 <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-right rounded-tr-2xl">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
-                            {staffList.map((staff, i) => (
+                            {filteredStaff.map((staff, i) => (
                                 <tr key={i} className="group/row hover:bg-slate-50/50 transition-all cursor-default">
                                     <td className="py-6 px-6">
                                         <div className="flex items-center space-x-4">
@@ -244,21 +318,9 @@ const HRModule: React.FC = () => {
                                         </span>
                                     </td>
                                     <td className="py-6 px-6 text-center">
-                                        <div className="flex items-center justify-center space-x-2">
-                                            <button
-                                                onClick={() => handleClockIn(staff.id)}
-                                                className="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                                disabled={staff.status === 'Active' || staff.status === 'On Route'}
-                                            >
-                                                IN
-                                            </button>
-                                            <button
-                                                onClick={() => handleClockOut(staff.id)}
-                                                className="bg-rose-100 hover:bg-rose-200 text-rose-700 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                                disabled={staff.status === 'Clocked Out'}
-                                            >
-                                                OUT
-                                            </button>
+                                        <div className="flex flex-col items-center">
+                                            <span className="text-sm font-black text-[#003366]">{staff.totalHoursToday.toFixed(1)} hrs</span>
+                                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter mt-1">Today's Accumulation</span>
                                         </div>
                                     </td>
                                     <td className="py-6 px-6 text-right">
@@ -266,9 +328,11 @@ const HRModule: React.FC = () => {
                                             <button onClick={() => handleEdit(staff)} className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg transition-colors">
                                                 <Pencil size={14} />
                                             </button>
-                                            <button onClick={() => handleDelete(staff.id)} className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors">
-                                                <Trash2 size={14} />
-                                            </button>
+                                            {!isInputer && (
+                                                <button onClick={() => handleDelete(staff.id)} className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors">
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
@@ -278,37 +342,47 @@ const HRModule: React.FC = () => {
                 </div>
             </div>
 
-            {/* Charts Section (Moved to Bottom) */}
+            {/* Data Tables Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Attendance Trend */}
-                <div className="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm">
-                    <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none mb-8">Weekly Attendance</h3>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={attendanceTrend}>
-                                <defs>
-                                    <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1} />
-                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                    cursor={{ stroke: '#8b5cf6', strokeWidth: 1, strokeDasharray: '4 4' }}
-                                />
-                                <Area type="monotone" dataKey="count" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorCount)" />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                {/* Weekly Attendance (Tabular) */}
+                <div className="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm overflow-hidden flex flex-col">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Weekly Headcount</h3>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Attendance Tabulation</p>
+                        </div>
+                        <CalendarClock size={20} className="text-[#0081cc]" />
+                    </div>
+                    <div className="overflow-x-auto flex-1">
+                        <table className="w-full text-left">
+                            <thead className="bg-[#003366] text-white">
+                                <tr>
+                                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest rounded-tl-2xl">Day of Week</th>
+                                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-center">Staff Present</th>
+                                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-right rounded-tr-2xl">Utilization</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                                {attendanceTrend.map((row, i) => (
+                                    <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                        <td className="py-4 px-6 font-black text-slate-700 text-sm uppercase">{row.day}</td>
+                                        <td className="py-4 px-6 text-center">
+                                            <span className="bg-blue-50 text-[#003366] px-3 py-1 rounded-lg text-xs font-black">{row.count}</span>
+                                        </td>
+                                        <td className="py-4 px-6 text-right">
+                                            <span className="text-xs font-bold text-slate-500">{((row.count / 148) * 100).toFixed(1)}%</span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
                 {/* Payroll Distribution */}
-                <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm">
-                    <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none mb-8">Payroll Split</h3>
-                    <div className="h-64 relative">
+                <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm flex flex-col">
+                    <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none mb-8">Role Distribution</h3>
+                    <div className="h-64 relative flex-1">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
@@ -329,11 +403,72 @@ const HRModule: React.FC = () => {
                         </ResponsiveContainer>
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
                             <span className="text-2xl font-black text-slate-800">100%</span>
-                            <p className="text-[9px] uppercase tracking-widest text-slate-400">Allocated</p>
+                            <p className="text-[9px] uppercase tracking-widest text-slate-400">Deployed</p>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Admin Only: Monthly Timesheet & Salary Breakdown */}
+            {!isInputer && (
+                <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm animate-in zoom-in-95 duration-500">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">Monthly Timesheet & Payroll</h3>
+                            <p className="text-[10px] font-bold text-[#ce1126] uppercase tracking-[0.2em] mt-1">Authorized Personnel Only • Automated Calculation</p>
+                        </div>
+                        <div className="bg-[#ce1126] text-white p-3 rounded-2xl shadow-lg shadow-red-900/10">
+                            <Briefcase size={24} />
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-[#003366] text-white">
+                                <tr>
+                                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest rounded-tl-2xl">Employee</th>
+                                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-center">Rate (₵/hr)</th>
+                                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-center">Monthly Hours</th>
+                                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-right rounded-tr-2xl">Final Salary (₵)</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {filteredStaff.map((staff, i) => (
+                                    <tr key={i} className="hover:bg-slate-50 transition-colors">
+                                        <td className="py-6 px-6">
+                                            <div className="flex items-center space-x-3">
+                                                <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center text-[10px] font-black">
+                                                    {staff.name.charAt(0)}
+                                                </div>
+                                                <span className="text-sm font-black text-slate-800">{staff.name}</span>
+                                            </div>
+                                        </td>
+                                        <td className="py-6 px-6 text-center text-sm font-bold text-slate-500">₵{staff.hourlyRate}</td>
+                                        <td className="py-6 px-6 text-center">
+                                            <span className="px-3 py-1 bg-green-50 text-green-700 rounded-lg text-xs font-black">
+                                                {staff.totalHoursMonth.toFixed(1)} hrs
+                                            </span>
+                                        </td>
+                                        <td className="py-6 px-6 text-right">
+                                            <span className="text-lg font-black text-slate-900 tracking-tighter">
+                                                ₵{(staff.totalHoursMonth * staff.hourlyRate).toLocaleString()}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot className="bg-slate-900 text-white">
+                                <tr>
+                                    <td colSpan={3} className="py-4 px-6 text-[10px] font-black uppercase tracking-widest rounded-bl-2xl">Total Payroll Liability</td>
+                                    <td className="py-4 px-6 text-right text-xl font-black tracking-tighter rounded-br-2xl">
+                                        ₵{filteredStaff.reduce((acc, s) => acc + (s.totalHoursMonth * s.hourlyRate), 0).toLocaleString()}
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            )}
 
             {/* Modal */}
             <BaseModal

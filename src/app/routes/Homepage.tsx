@@ -16,13 +16,51 @@ import {
     Package,
     ArrowRight,
     Menu,
-    X
+    X,
+    MessageSquare,
+    Bot,
+    Send,
+    ShoppingBag,
+    PhoneCall,
+    MessageCircle
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Homepage: React.FC = () => {
     const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [showChatbot, setShowChatbot] = useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [orderQuantity, setOrderQuantity] = useState('50');
+    const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('delivery');
+
+    const handleWhatsAppOrder = () => {
+        const message = `Hello UniEmmanuel Ventures, I'd like to order *${orderQuantity} bags* of Voltic Cool Pac.\n\n*Method:* ${deliveryMethod === 'delivery' ? '🚚 Delivery to my location' : '🏪 Self-Pickup at factory'}\n\nPlease confirm availability and total cost. Thank you!`;
+        const encodedMessage = encodeURIComponent(message);
+        window.open(`https://wa.me/233244925320?text=${encodedMessage}`, '_blank');
+    };
+
+    // Scroll listener for chatbot visibility
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 300) {
+                setShowChatbot(true);
+            } else {
+                setShowChatbot(false);
+            }
+
+            if (window.scrollY > 50) {
+                setIsScrolled(true);
+            } else {
+                setIsScrolled(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // Intersection Observer for scroll animations
     useEffect(() => {
@@ -59,7 +97,7 @@ const Homepage: React.FC = () => {
             )}
 
             {/* Mobile Slide-in Menu */}
-            <div className={`fixed top - 0 right - 0 h - full w - [280px] bg - white z - [70] shadow - 2xl transform transition - transform duration - 300 xl:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} `}>
+            <div className={`fixed top-0 right-0 h-full w-[280px] bg-white z-[70] shadow-2xl transform transition-transform duration-300 xl:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-8">
                         <img src="/logo.png" alt="Unimanuel Logo" className="h-10 w-auto" />
@@ -117,7 +155,7 @@ const Homepage: React.FC = () => {
             </div>
 
             {/* 2. NAVBAR (Premium Design Restored) */}
-            <nav className="fixed top-0 left-0 w-full z-50 pointer-events-none px-4 md:px-6 lg:px-12 py-4 md:py-6">
+            <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 px-4 md:px-6 lg:px-12 py-4 ${isScrolled ? 'bg-white/80 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-6'}`}>
                 <div className="container mx-auto flex justify-between items-center pointer-events-auto">
                     {/* Logo Section */}
                     <Link to="/" className="flex items-center bg-white p-2 md:p-3 rounded-b-xl shadow-lg border-t-2 border-[#ce1126] relative z-50 pointer-events-auto">
@@ -161,7 +199,7 @@ const Homepage: React.FC = () => {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] opacity-80">Call Us</span>
-                                    <span className="font-black tracking-tight text-sm md:text-[16px] lg:text-[18px]">0XXXXXXXXX</span>
+                                    <span className="font-black tracking-tight text-sm md:text-[16px] lg:text-[18px]">0244925320</span>
                                 </div>
                             </div>
                         </div>
@@ -170,20 +208,20 @@ const Homepage: React.FC = () => {
             </nav>
 
             {/* 3. HERO SECTION (Reverted to Blue with CTA Buttons) */}
-            <section id="home" className="relative min-h-screen flex items-center overflow-hidden pt-20 md:pt-24">
+            <section id="home" className="relative min-h-screen flex items-center overflow-hidden pt-28 md:pt-32">
                 {/* Background Layer */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="/images/water_hero.jpg"
-                        alt="Background"
+                        src="/images/warehouse_stock.png"
+                        alt="Warehouse Stock"
                         className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-[#003366]/80 md:bg-[#003366]/60"></div>
+                    <div className="absolute inset-0 bg-[#003366]/40 md:bg-[#003366]/30"></div>
                 </div>
 
                 {/* Diagonal Overlay (Desktop Only) */}
                 <div className="absolute inset-0 z-0 hidden lg:block">
-                    <div className="absolute top-0 left-0 w-[68%] h-full bg-[#003366]/95 transform -skew-x-12 -translate-x-[20%] shadow-[30px_0_100px_rgba(0,0,0,0.6)]"></div>
+                    <div className="absolute top-0 left-0 w-[68%] h-full bg-[#003366]/80 transform -skew-x-12 -translate-x-[20%] shadow-[30px_0_100px_rgba(0,0,0,0.6)]"></div>
                 </div>
 
                 <div className="container mx-auto px-4 md:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center py-12 md:py-20">
@@ -202,8 +240,12 @@ const Homepage: React.FC = () => {
                             Highest quality health-focused sachet water and distribution services across the Western Region.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-4 md:pt-6">
-                            <button className="bg-[#0081cc] hover:bg-[#ff8c00] text-white px-6 md:px-8 py-3 md:py-4 font-black uppercase text-[10px] md:text-xs tracking-widest shadow-xl transition-all active:scale-95 rounded-lg">
-                                ORDER NOW
+                            <button
+                                onClick={() => setIsOrderModalOpen(true)}
+                                className="bg-[#0081cc] hover:bg-[#ff8c00] text-white px-6 md:px-8 py-3 md:py-4 font-black uppercase text-[10px] md:text-xs tracking-widest shadow-xl transition-all active:scale-95 rounded-lg flex items-center justify-center space-x-2"
+                            >
+                                <ShoppingBag size={14} />
+                                <span>ORDER NOW</span>
                             </button>
                             <button
                                 onClick={() => navigate('/login')}
@@ -217,9 +259,9 @@ const Homepage: React.FC = () => {
                     <div className="relative animate-in slide-in-from-right duration-1000">
                         <div className="relative z-10 scale-100 md:scale-110">
                             <img
-                                src="/images/bottle_featured.png"
-                                alt="Voltic Cool Pac Product"
-                                className="w-full max-w-[300px] md:max-w-none mx-auto drop-shadow-[0_35px_35px_rgba(0,0,0,0.5)]"
+                                src="/images/voltic_featured_red.png"
+                                alt="Voltic Cool Pac Products"
+                                className="w-full max-w-[350px] md:max-w-none mx-auto drop-shadow-[0_45px_45px_rgba(0,0,0,0.6)] rounded-2xl"
                             />
                         </div>
                         {/* Circle Decoration behind bottle */}
@@ -380,10 +422,10 @@ const Homepage: React.FC = () => {
                 <div className="container mx-auto relative z-10">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center pb-12 md:pb-16">
                         {[
-                            { val: '784', label: 'Happy Clients', icon: Users },
-                            { val: '987', label: 'Transport', icon: Truck },
-                            { val: '974', label: 'Employees', icon: Users },
-                            { val: '687', label: 'Annual Turnover', icon: Trophy },
+                            { val: '250+', label: 'Happy Clients', icon: Users },
+                            { val: '15+', label: 'Transport', icon: Truck },
+                            { val: '45+', label: 'Employees', icon: Users },
+                            { val: '12', label: 'Years Experience', icon: Trophy },
                         ].map((stat, i) => (
                             <div key={i} className="space-y-4 group">
                                 <div className="w-20 h-20 bg-[#0081cc] rounded-full flex items-center justify-center mx-auto text-white group-hover:bg-[#ff8c00] transition-colors shadow-2xl">
@@ -503,6 +545,228 @@ const Homepage: React.FC = () => {
                     </p>
                 </div>
             </footer>
+
+            {/* Order Now Modal */}
+            {isOrderModalOpen && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6">
+                    <div
+                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
+                        onClick={() => setIsOrderModalOpen(false)}
+                    />
+                    <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-[0_30px_80px_rgba(0,0,0,0.4)] relative z-10 overflow-hidden animate-in zoom-in duration-300">
+                        {/* Header */}
+                        <div className="bg-[#003366] p-8 text-white relative">
+                            <div className="flex items-center space-x-4">
+                                <div className="w-14 h-14 bg-[#0081cc] rounded-2xl flex items-center justify-center border-2 border-white/20">
+                                    <ShoppingBag size={28} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black uppercase tracking-widest">Place Your Order</h3>
+                                    <p className="text-blue-200 text-xs font-bold uppercase tracking-tighter mt-1 opacity-80">Voltic Cool Pac • Pure Water</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setIsOrderModalOpen(false)}
+                                className="absolute top-8 right-8 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-8 space-y-8">
+                            <div className="space-y-4">
+                                <h4 className="text-[#003366] font-black text-sm uppercase tracking-widest border-l-4 border-[#0081cc] pl-4">Our Core Product</h4>
+                                <div className="grid grid-cols-1">
+                                    <div className="bg-slate-50 p-6 rounded-2xl border-2 border-[#0081cc]/20 flex flex-col items-center text-center space-y-3 group hover:border-[#0081cc] transition-colors">
+                                        <div className="w-14 h-14 bg-white shadow-md rounded-2xl flex items-center justify-center text-[#0081cc]">
+                                            <Package size={24} />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-black uppercase tracking-tighter text-slate-500">Pure Sachet Water (500ml)</span>
+                                            <h5 className="text-sm font-black text-[#003366] uppercase">Voltic Cool Pac</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <h4 className="text-[#003366] font-black text-sm uppercase tracking-widest border-l-4 border-[#ff8c00] pl-4">Order Details</h4>
+
+                                <div className="space-y-5">
+                                    {/* Quantity Selection */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Quantity (Bags)</label>
+                                        <div className="relative">
+                                            <input
+                                                type="number"
+                                                value={orderQuantity}
+                                                onChange={(e) => setOrderQuantity(e.target.value)}
+                                                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 font-black text-[#003366] focus:border-[#0081cc] focus:outline-none transition-all"
+                                                placeholder="Enter quantity"
+                                            />
+                                            <Package className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                                        </div>
+                                    </div>
+
+                                    {/* Delivery Method Toggle */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">How do you want it?</label>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <button
+                                                onClick={() => setDeliveryMethod('delivery')}
+                                                className={`p-4 rounded-2xl border-2 font-black text-[10px] uppercase tracking-widest transition-all ${deliveryMethod === 'delivery' ? 'bg-[#0081cc] border-[#0081cc] text-white shadow-lg' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'}`}
+                                            >
+                                                <div className="flex flex-col items-center space-y-2">
+                                                    <Truck size={20} />
+                                                    <span>Delivery</span>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={() => setDeliveryMethod('pickup')}
+                                                className={`p-4 rounded-2xl border-2 font-black text-[10px] uppercase tracking-widest transition-all ${deliveryMethod === 'pickup' ? 'bg-[#003366] border-[#003366] text-white shadow-lg' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'}`}
+                                            >
+                                                <div className="flex flex-col items-center space-y-2">
+                                                    <ShoppingBag size={20} />
+                                                    <span>Self-Pickup</span>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="pt-4 space-y-3">
+                                        <button
+                                            onClick={handleWhatsAppOrder}
+                                            className="flex items-center justify-center space-x-3 w-full bg-[#25D366] hover:bg-green-600 text-white p-5 rounded-2xl transition-all shadow-xl hover:-translate-y-1 active:scale-95 group font-black uppercase text-xs tracking-widest"
+                                        >
+                                            <MessageCircle size={20} />
+                                            <span>Send Order to WhatsApp</span>
+                                        </button>
+
+                                        <div className="relative flex items-center justify-center py-2">
+                                            <div className="absolute inset-0 flex items-center">
+                                                <div className="w-full border-t border-slate-100"></div>
+                                            </div>
+                                            <span className="relative bg-white px-4 text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">OR CALL DIRECTLY</span>
+                                        </div>
+
+                                        <a
+                                            href="tel:0244925320"
+                                            className="flex items-center justify-center space-x-3 w-full bg-[#003366] hover:bg-[#001f3f] text-white p-5 rounded-2xl transition-all shadow-lg hover:-translate-y-1 active:scale-95 font-black uppercase text-xs tracking-widest"
+                                        >
+                                            <PhoneCall size={18} />
+                                            <span>Call 0244925320</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer Decoration */}
+                        <div className="p-6 bg-slate-50 text-center border-t border-slate-100">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Quality Distribution You Can Trust</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Chatbot Interface */}
+            <div className={`fixed bottom-8 right-8 z-[100] transition-all duration-500 transform ${showChatbot ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
+                <div className="flex flex-col items-end space-y-3">
+                    {/* Chat Window */}
+                    <div className={`bg-white w-[320px] sm:w-[380px] h-[500px] rounded-[2.5rem] shadow-[0_25px_70px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden flex flex-col transition-all duration-500 origin-bottom-right ${isChatOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'}`}>
+                        {/* Chat Header */}
+                        <div className="bg-[#003366] p-6 text-white relative">
+                            <div className="flex items-center space-x-4">
+                                <div className="w-12 h-12 bg-[#0081cc] rounded-2xl flex items-center justify-center border-2 border-white/20">
+                                    <Bot size={24} className="text-white" />
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-sm uppercase tracking-widest">UniEmmanuel AI</h4>
+                                    <p className="text-[10px] font-bold text-blue-300 uppercase tracking-tighter">Assistant • 24/7 Support</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setIsChatOpen(false)}
+                                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+
+                        {/* Chat Messages */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                            <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center mt-1">
+                                    <Bot size={14} className="text-[#003366]" />
+                                </div>
+                                <div className="bg-slate-50 p-4 rounded-2xl rounded-tl-none border border-slate-100 max-w-[80%]">
+                                    <p className="text-xs font-bold text-slate-700 leading-relaxed">
+                                        Hello! Welcome to UniEmmanuel. I'm your virtual assistant. How can I help you regarding our water services today?
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex justify-end">
+                                <div className="bg-[#0081cc] p-4 rounded-2xl rounded-tr-none text-white max-w-[80%] shadow-lg shadow-blue-500/20">
+                                    <p className="text-xs font-bold leading-relaxed">
+                                        I'd like to order Voltic Cool Pac.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center mt-1">
+                                    <Bot size={14} className="text-[#003366]" />
+                                </div>
+                                <div className="bg-slate-50 p-4 rounded-2xl rounded-tl-none border border-slate-100 max-w-[80%]">
+                                    <p className="text-xs font-bold text-slate-700 leading-relaxed">
+                                        Of course! You can tap the "ORDER NOW" button in the hero section, or I can connect you to our sales team right here. Which would you prefer?
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Chat Input */}
+                        <div className="p-4 border-t border-slate-50 bg-slate-50/50">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Type your message..."
+                                    className="w-full bg-white border border-slate-100 rounded-2xl px-5 py-4 pr-14 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#0081cc]/20 focus:border-[#0081cc] transition-all"
+                                />
+                                <button className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#0081cc] text-white rounded-xl flex items-center justify-center hover:bg-[#003366] transition-colors">
+                                    <Send size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Chat Bubble & Label */}
+                    {!isChatOpen && (
+                        <div className="bg-white px-5 py-3 rounded-2xl shadow-2xl border border-blue-50 relative animate-in fade-in slide-in-from-bottom duration-500">
+                            <div className="absolute -bottom-2 right-6 w-4 h-4 bg-white border-r border-b border-blue-50 rotate-45"></div>
+                            <p className="text-[10px] font-black text-[#003366] uppercase tracking-[0.1em] flex items-center">
+                                <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                                Talk to UniEmmanuel
+                            </p>
+                        </div>
+                    )}
+                    <button
+                        onClick={() => setIsChatOpen(!isChatOpen)}
+                        className={`w-16 h-16 rounded-[2rem] shadow-[0_20px_50px_rgba(0,129,204,0.3)] flex items-center justify-center transition-all duration-500 hover:scale-110 hover:-rotate-6 group relative border-4 border-white overflow-hidden ${isChatOpen ? 'bg-white text-[#003366]' : 'bg-[#0081cc] text-white'}`}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-transparent opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                        {isChatOpen ? (
+                            <X size={28} />
+                        ) : (
+                            <>
+                                <MessageSquare size={28} className="group-hover:hidden transition-all" />
+                                <Bot size={28} className="hidden group-hover:block animate-bounce" />
+                            </>
+                        )}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

@@ -162,7 +162,7 @@ const DashboardLayout: React.FC = () => {
                                     <div className="absolute left-0 w-1.5 h-6 bg-brand-red rounded-full -ml-4" />
                                 )}
                                 <item.icon className={cn("w-5 h-5 transition-transform duration-200 group-hover:scale-110", isDesktopSidebarExpanded ? "mr-4" : "md:mx-auto mr-4")} />
-                                <span className={cn("text-sm font-bold tracking-tight", !isDesktopSidebarExpanded && "md:hidden")}>{item.name}</span>
+                                <span className={cn("text-sm font-bold tracking-tight whitespace-nowrap", !isDesktopSidebarExpanded && "md:hidden")}>{item.name}</span>
                             </Link>
                         )
                     })}
@@ -187,8 +187,8 @@ const DashboardLayout: React.FC = () => {
             {/* Main Content */}
             <main className="flex-1 flex flex-col overflow-hidden w-full">
                 {/* Header */}
-                <header className="bg-white border-b border-slate-100 px-4 md:px-8 py-4 md:py-5 flex items-center justify-between sticky top-0 z-30 shadow-sm md:shadow-none">
-                    <div className="flex items-center">
+                <header className="bg-white border-b border-slate-100 px-4 md:px-8 py-4 md:py-5 flex items-center justify-between sticky top-0 z-30 shadow-sm md:shadow-none flex-nowrap overflow-hidden">
+                    <div className="flex items-center flex-shrink-0">
                         {/* Mobile Hamburger */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
@@ -197,12 +197,12 @@ const DashboardLayout: React.FC = () => {
                             <Menu size={24} />
                         </button>
 
-                        <h2 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight truncate max-w-[200px] md:max-w-none">
+                        <h2 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight truncate max-w-[140px] xs:max-w-[200px] md:max-w-none whitespace-nowrap">
                             {location.pathname === '/dashboard' ? 'Overview' : location.pathname.split('/').pop()?.replace('-', ' ')}
                         </h2>
                     </div>
 
-                    <div className="flex items-center space-x-3 md:space-x-6">
+                    <div className="flex items-center space-x-3 md:space-x-6 flex-nowrap flex-shrink-0">
                         <div className="flex items-center bg-slate-50 p-1.5 rounded-xl border border-slate-100 hidden md:flex">
                             <button className="p-2 text-slate-500 hover:text-brand-red transition-colors">
                                 <Moon size={18} />

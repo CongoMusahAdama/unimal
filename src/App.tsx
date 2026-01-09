@@ -13,8 +13,8 @@ import InventoryModule from './modules/inventory/InventoryModule';
 import SalesModule from './modules/sales/SalesModule';
 import MaintenanceModule from './modules/maintenance/MaintenanceModule';
 import HRModule from './modules/hr/HRModule';
+import ReportsModule from './modules/reports/ReportsModule';
 import InputerDashboard from './app/routes/InputerDashboard';
-import { FileText } from 'lucide-react';
 
 const Unauthorized = () => <div className="p-8 text-center text-rose-500 font-bold text-2xl uppercase tracking-tighter">You are not authorized to view this page.</div>;
 
@@ -48,13 +48,7 @@ function App() {
 
               <Route path="reports" element={
                 <ProtectedRoute>
-                  <div className="p-20 text-center animate-in fade-in duration-1000">
-                    <div className="w-24 h-24 bg-blue-600 rounded-3xl mx-auto flex items-center justify-center text-white mb-8 shadow-2xl shadow-blue-600/20">
-                      <FileText size={42} />
-                    </div>
-                    <h2 className="text-5xl font-black text-slate-900 uppercase tracking-tighter">Reporting Engine</h2>
-                    <p className="text-slate-400 mt-4 uppercase tracking-[0.4em] text-[10px] font-black">Generating Live Analytical Insights...</p>
-                  </div>
+                  <ReportsModule />
                 </ProtectedRoute>
               } />
 
